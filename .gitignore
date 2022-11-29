@@ -1,0 +1,3 @@
+*.bin
+libmystem_c_binding.so
+tomita-parser
