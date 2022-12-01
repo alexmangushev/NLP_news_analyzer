@@ -80,7 +80,7 @@ if __name__ == "__main__":
     max_urls = args.max_urls
     """
     url = 'https://www.volgograd.kp.ru/online/'
-    max_urls = 500
+    max_urls = 30
     
     crawl(url, max_urls=max_urls)
     print("[+] Total Internal links:", len(internal_urls))
