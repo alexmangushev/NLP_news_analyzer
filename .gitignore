@@ -1,3 +1,4 @@
 *.bin
 libmystem_c_binding.so
 tomita-parser
+README_tomita.md
