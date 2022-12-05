@@ -5,38 +5,117 @@ import textwrap
 import os
 from bs4 import BeautifulSoup
 from pymongo import MongoClient
+from datetime import datetime
+from typing import (
+    Any,
+    Dict,
+    List
+)
 
 URL_ADDRESS = "https://www.volgograd.kp.ru/online/"
+# https://www.volgograd.kp.ru/daily/27444/4647659/
+# https://www.volgograd.kp.ru/online/news/5035762/
+# https://www.volgograd.kp.ru/video/
+# https://www.volgograd.kp.ru/photo/
 
+# "    data.url = window.location.href;"
+# "full_path":"https://www.volgograd.kp.ru/daily/27432/4634521/"
+
+# /mnt/c/Users/fredo/Desktop/Work_Stereotech/repositories/NLP_news_analyzer/cloud_env/bin/pip
 
 
 class ParsingInMongo:
     url = ""
     filename = ""
     path = ""
-    content_tags = ['script', 'p']
+    content_tags = ['p']
     wrap = 200
     def __init__(self):
         # Create the client
-        self.client = MongoClient('localhost', 27017)
+        self.client = MongoClient("mongodb://localhost:27017/")
         # Connect to database
         self.db = self.client['compling_db']
         # Fetch collection
         self.collection = self.db['compling_sema']
         
-        self.url = URL_ADDRESS
-        # Get path and filename for saving article by splitting URL.
-        # If the URL ends with some.html, then the previous (-2) element
-        # of the path is taken to form the path and the filename = some.html.txt respectively.
-        path_arr = self.url.split('/')
-        if path_arr[-1] != '':
-            self.filename = path_arr[-1] + ".txt"
-            self.path = os.getcwd() + "/".join(path_arr[1:-1])
-        else:
-            self.filename = path_arr[-2] + ".txt"
-            self.path = os.getcwd() + "/".join(path_arr[1:-2])
-        if not os.path.exists(self.path):
-            os.makedirs(self.path)
+        self.internal_links = []
+        self.links_for_links = []
+        self.photo_video_links = []
+        with open(r"C:\Users\fredo\Desktop\Work_Stereotech\repositories\NLP_news_analyzer\www.volgograd.kp.ru_internal_links.txt") as file:
+            for internal_link in file:
+                internal_link_separate = re.findall(r"https://www.volgograd.kp.ru/daily/\d{4,7}" or 
+                                                    r"https://www.volgograd.kp.ru/online/news/\d{4,7}" or
+                                                    r"https://www.volgograd.kp.ru/video/" or
+                                                    r"https://www.volgograd.kp.ru/photo/", 
+                                                    internal_link)
+                if internal_link_separate == []:
+                    self.links_for_links.append(internal_link.strip())
+                elif internal_link_separate[0] == "https://www.volgograd.kp.ru/video/" or internal_link_separate[0] == "https://www.volgograd.kp.ru/photo/":
+                    self.photo_video_links.append(internal_link.strip())
+                else:
+                    self.internal_links.append(internal_link.strip())
+        
+        # for link in self.internal_links:
+        #     print(link)
+        json_for_mongo: List[Dict[str, Any]] = []
+        for url in self.internal_links:
+            #self.url = URL_ADDRESS
+            self.url = url
+            
+            r = requests.get(self.url).text
+            soup = BeautifulSoup(r, 'html.parser')
+            h1_heading = str(soup.find('h1'))
+            
+            # Получаем название статьи
+            heading_list = []
+            heading_list = h1_heading.split('>')
+            news_name = heading_list[1].strip('</h1')
+            
+            # Проверяем на <span>
+            news_name_list = 
+            
+            # Get path and filename for saving article by splitting URL.
+            # If the URL ends with some.html, then the previous (-2) element
+            # of the path is taken to form the path and the filename = some.html.txt respectively.
+            path_arr = self.url.split('/')
+            if path_arr[-1] != '':
+                self.filename = path_arr[-1] + ".txt"
+                self.path = os.getcwd() + "/".join(path_arr[1:-1])
+            else:
+                self.filename = path_arr[-2] + ".txt"
+                self.path = os.getcwd() + "/".join(path_arr[1:-2])
+            if not os.path.exists(self.path):
+                os.makedirs(self.path)
+                
+            news_text = self.get_text()
+            
+            dict_for_mongo: Dict[str, Any] = {}
+            
+            dict_for_mongo['news_name'] = news_name
+            dict_for_mongo['date'] = datetime.now()
+            dict_for_mongo['link'] = url
+            dict_for_mongo['text'] = news_text
+            json_for_mongo.append(dict_for_mongo)
+            
+        self.input_in_mongo(json_for_mongo)
+            
+    def input_in_mongo(self, json):
+        compling_sema = self.collection
+        compling_sema.insert_many(json)
+        
+        # self.url = url
+        # # Get path and filename for saving article by splitting URL.
+        # # If the URL ends with some.html, then the previous (-2) element
+        # # of the path is taken to form the path and the filename = some.html.txt respectively.
+        # path_arr = self.url.split('/')
+        # if path_arr[-1] != '':
+        #     self.filename = path_arr[-1] + ".txt"
+        #     self.path = os.getcwd() + "/".join(path_arr[1:-1])
+        # else:
+        #     self.filename = path_arr[-2] + ".txt"
+        #     self.path = os.getcwd() + "/".join(path_arr[1:-2])
+        # if not os.path.exists(self.path):
+        #     os.makedirs(self.path)
         
     def get_text(self):
         r = requests.get(self.url).text
@@ -55,6 +134,8 @@ class ParsingInMongo:
                 # устанавливаем ширину строки равной self.wrap (по умолчанию, 80 символов)
                 wrapped_text += ''.join(textwrap.fill(p.text, self.wrap)) + "\n\n"
         self.write_in_file(wrapped_text)
+        
+        return wrapped_text
         
     def write_in_file(self, text):
         # записывает text в каталог self.path:"[CUR_DIR]/host.ru/path_item1/path_item2/..."
