@@ -64,15 +64,24 @@ class ParsingInMongo:
             
             r = requests.get(self.url).text
             soup = BeautifulSoup(r, 'html.parser')
+            
             h1_heading = str(soup.find('h1'))
+            span_data = str(soup.find('span', {'class': 'sc-j7em19-1 eDdTDf'}))
+            
+            # Получаем дату публикации статьи
+            span_data_list = []
+            span_data_list = span_data.split('>')
+            news_data = span_data_list[1].strip('</span')
             
             # Получаем название статьи
             heading_list = []
             heading_list = h1_heading.split('>')
             news_name = heading_list[1].strip('</h1')
             
-            # Проверяем на <span>
-            news_name_list = 
+            # Проверяем на <span> и если он есть, устанавливаем новое значение в news_name
+            news_name_list = news_name.split(' ')
+            if news_name_list[0] == 'span':
+                news_name = heading_list[2].strip('</span') + heading_list[3].strip('</h1')
             
             # Get path and filename for saving article by splitting URL.
             # If the URL ends with some.html, then the previous (-2) element
@@ -92,7 +101,7 @@ class ParsingInMongo:
             dict_for_mongo: Dict[str, Any] = {}
             
             dict_for_mongo['news_name'] = news_name
-            dict_for_mongo['date'] = datetime.now()
+            dict_for_mongo['date'] = news_data
             dict_for_mongo['link'] = url
             dict_for_mongo['text'] = news_text
             json_for_mongo.append(dict_for_mongo)
