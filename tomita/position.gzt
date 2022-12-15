@@ -1,6 +1,0 @@
-encoding "utf8";
-
-TAuxDicArticle "Должность" {
-    key = { "positions.txt" type=FILE } 
-}
-
