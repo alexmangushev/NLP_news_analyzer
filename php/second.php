@@ -8,19 +8,37 @@ $collection = $client->NLP->Second;
 
 $result = $collection->find(); //fix /home/alex/nlp/sema/php/vendor/mongodb/mongodb/src/Operation/Find.php:317
 
-/*foreach ($result as $i)
+$start_index = 0;
+$step = 10;
+
+// get count of data in data base
+$count_of_record = 0;
+foreach($result as $item)
+    $count_of_record++;
+
+$result = $collection->find(); //fix /home/alex/nlp/sema/php/vendor/mongodb/mongodb/src/Operation/Find.php:317
+
+
+    
+if (!empty($_GET))
 {
-    //echo $i['text'] . "\n";
-}*/
+    $start_index = $_GET['count'];
+
+    if ($start_index < 0)
+        $start_index = 0;
+    elseif (($start_index + $step) > $count_of_record) 
+        $start_index = $count_of_record - $step;
+}
 
 ?>
 
 <div class="container">
     <p class="py-2"> <a href="/php/index.php">Первый студент</a></p>
     <p class="py-2"> <a href="/php/third.php">Третий студент</a></p>
+    <!--<p class="py-2"> <a href="/php/start_python.php?scrypt=2">Запустить обработку новостей</a></p>-->
 </div>
 
-<!-- db data 1 -->
+<!-- db data 2 -->
 <div class="container">
 
     <div class="container text-center mt-3">
@@ -28,23 +46,49 @@ $result = $collection->find(); //fix /home/alex/nlp/sema/php/vendor/mongodb/mong
             <table class="table">
                 <thead>
                 <tr>
+                    <th scope="col">Номер</th>
                     <th scope="col">ID</th>
                     <th scope="col">Текст</th>
                 </tr>
                 </thead>
 
                 <tbody>
-                <?php foreach($result as $item):?>
+                <?php $cnt = 0; foreach($result as $item):?>
                     <tr>
-                        <td><?php print_r($item['_id']) ?></td>
-                        <td><?php print_r($item['text']) ?></td>
-                <?php endforeach;?>
+                        <?php if ($cnt >= $start_index && $cnt < $start_index + $step):?>
+                            <td><?php print_r($cnt) ?></td>
+                            <td><?php print_r($item['_id']) ?></td>
+                            <td><?php print_r($item['text']) ?></td>
+                        <?php endif;?> 
+                <?php $cnt++; endforeach;?>
                 </tbody>
             </table>
     <?php endif;?>
     </div>
 
 </div>
+
+<form action="second.php" method="GET">
+
+    <div class="col-md-12 text-center ">
+        <div class="form-group">
+            <input type="text" hidden name="count" id="count" value="<?php print_r($start_index - $step) ?>"
+             class="form-control">
+            <button type="submit" class=" btn btn-block mybtn btn-primary tx-tfm login-btn">Назад</button>
+        </div>
+    </div>
+</form>
+
+<form action="second.php" method="GET">
+
+    <div class="col-md-12 text-center ">
+        <div class="form-group">
+            <input type="text" hidden name="count" id="count" value="<?php print_r($start_index + $step) ?>" 
+            class="form-control">
+            <button type="submit" class=" btn btn-block mybtn btn-primary tx-tfm login-btn">Вперед</button>
+        </div>
+    </div>
+</form>
 
 </body>
 </html>
