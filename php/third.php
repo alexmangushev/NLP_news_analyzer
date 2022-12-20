@@ -37,7 +37,7 @@ if (!empty($_GET))
 
 <!-- db data 3 -->
 <div class="container">
-
+    <p class="py-2"> Общее число записей: <?php print_r($count_of_record) ?></p>
     <div class="container text-center mt-3">
     <?php if(count($result) > 0):?>
             <table class="table">

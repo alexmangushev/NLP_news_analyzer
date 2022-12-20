@@ -28,14 +28,28 @@ if (!empty($_GET))
         $start_index = 0;
     elseif (($start_index + $step) > $count_of_record) 
         $start_index = $count_of_record - $step;
-    //print_r($start_index);
+
+
+    // Поиск записи по ID
+    if (sizeof($_GET['id']) > 0)
+    {
+        $step = 1;
+        $result = $collection->find(); //fix /home/alex/nlp/sema/php/vendor/mongodb/mongodb/src/Operation/Find.php:317
+        
+
+        $i = 0;
+        foreach($result as $item)
+        {
+            if ($item['_id'] == $_GET['id'])
+                $start_index = $i;
+            $i++;
+        }
+
+        $result = $collection->find(); //fix /home/alex/nlp/sema/php/vendor/mongodb/mongodb/src/Operation/Find.php:317
+        
+    }
+    
 }
-
-
-/*foreach ($result as $i)
-{
-    //echo $i['text'] . "\n";
-}*/
 
 ?>
 
@@ -46,6 +60,25 @@ if (!empty($_GET))
 
 <!-- db data 1 -->
 <div class="container">
+    
+    <p class="py-2"> Общее число записей: <?php print_r($count_of_record) ?></p>
+
+    <form action="index.php" method="GET">
+        <div class="col-md-12 text-center ">
+            <div class="form-group">
+                <input type="text" name="id" id="id" class="form-control" placeholder="63a0eb6fcc623a5f6f506214 ">
+                <button type="submit" class=" btn btn-block mybtn btn-primary tx-tfm login-btn">Поиск</button>
+            </div>
+        </div>
+    </form>
+
+    <form action="index.php" method="GET">
+        <div class="col-md-12 text-center ">
+            <div class="form-group">
+                <button type="submit" class=" btn btn-block mybtn btn-primary tx-tfm login-btn">Отмена</button>
+            </div>
+        </div>
+    </form>
 
     <div class="container text-center mt-3">
     <?php if(count($result) > 0):?>
