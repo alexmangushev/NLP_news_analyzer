@@ -1,7 +1,16 @@
 import requests
+import colorama
 from urllib.parse import urlparse, urljoin
 from bs4 import BeautifulSoup
-import colorama
+from selenium import webdriver
+from selenium.webdriver import Chrome
+from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.support.ui import WebDriverWait as wait
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.common.exceptions import NoSuchElementException
+from time import sleep
+from tqdm import tqdm
+
 
 # запускаем модуль colorama
 colorama.init()
@@ -9,6 +18,7 @@ GREEN = colorama.Fore.GREEN
 GRAY = colorama.Fore.LIGHTBLACK_EX
 RESET = colorama.Fore.RESET
 YELLOW = colorama.Fore.YELLOW
+URL = 'https://www.volgograd.kp.ru/online/'
 
 
 class ParsingLinks:
@@ -25,6 +35,11 @@ class ParsingLinks:
                 'User-Agent': 'My User Agent 1.0',
             }
         )
+        # переключатель кнопки
+        driver = Chrome('/chromedriver/chromedriver.exe')
+        driver.get(URL)
+        button = driver.find_element_by_xpath('xpath of the li you are trying to access')
+        button.click()
         
     def is_valid(self, url):
         """
@@ -93,7 +108,7 @@ class ParsingLinks:
 
 obj = ParsingLinks()
 
-def links_parser(max_urls: int = 0, input_url = 'https://www.volgograd.kp.ru/online/'):
+def links_parser(max_urls: int = 0, input_url = URL):
 # if __name__ == "__main__":
     # import argparse
     # """
