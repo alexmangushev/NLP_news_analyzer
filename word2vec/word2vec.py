@@ -74,6 +74,7 @@ if not os.path.exists('/home/alex/nlp/sema/word2vec/word2vec_model'):
     stop_words = StopWordsRemover.loadDefaultStopWords('russian')
     remover = StopWordsRemover(inputCol='words', outputCol='filtered', stopWords=stop_words)
     filtered = remover.transform(words)
+    
 
     # Вывести таблицу filtered
     #filtered.show()
