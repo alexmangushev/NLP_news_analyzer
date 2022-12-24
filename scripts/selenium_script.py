@@ -25,17 +25,6 @@ options.add_argument('--ignore-ssl-errors')
 browser = Chrome(service=Service('C:\chromedriver\chromedriver.exe'), options=options)
 url = 'https://www.volgograd.kp.ru/online/'
 
-# browser.get(url)
-# button = browser.find_element_by_css_selector("#app > div.sc-13iz5ku-0.lnKmOk > div > div.sc-1izj9yl-0.mgzJs > div > div:nth-child(2) > div.sc-1ktpw9t-0.cwduiG > div > button")
-# # news = browser.find_elements_by_class_name("sc-1tputnk-13")
-# # print(len(news))
-
-# # headers = requests.utils.default_headers()
-# # domain_name = urlparse(url).netloc
-# soup = BeautifulSoup(browser.page_source, "lxml")
-
-# events = soup.find_all('div', class_="sc-1tputnk-13")
-
 browser.get(url)
 button = browser.find_element_by_css_selector("#app > div.sc-13iz5ku-0.lnKmOk > div > div.sc-1izj9yl-0.mgzJs > div > div:nth-child(2) > div.sc-1ktpw9t-0.cwduiG > div > button")
 soup = BeautifulSoup(browser.page_source, "lxml")
