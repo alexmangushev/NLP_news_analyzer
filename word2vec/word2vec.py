@@ -84,13 +84,13 @@ if not os.path.exists('/home/alex/nlp/sema/word2vec/word2vec_model'):
     # Вывести столбец "filtered" таблицы filtered с токенами после удаления стоп-слов
     #filtered.select('filtered').show(truncate=False, vertical=True)
 
-    word2Vec = Word2Vec(vectorSize=3, minCount=0, inputCol='words', outputCol='result')
+    word2Vec = Word2Vec(vectorSize=3, inputCol='filtered', outputCol='result')
     model = word2Vec.fit(filtered)
     w2v_df = model.transform(filtered)
     w2v_df.show()
     model.save("/home/alex/nlp/sema/word2vec/word2vec_model")
 
-    spark.stop()
+    #spark.stop()
 
 
 model = Word2VecModel.load('/home/alex/nlp/sema/word2vec/word2vec_model')

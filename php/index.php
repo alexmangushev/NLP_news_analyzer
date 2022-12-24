@@ -99,10 +99,21 @@ if (!empty($_GET))
                     <tr>
                         <?php if ($cnt >= $start_index && $cnt < $start_index + $step):?>
                             <td><?php print_r($cnt) ?></td>
-                            <td><?php print_r($item['_id']) ?></td>
+                            <td>
+                                <form action="second.php" method="GET">
+                                <div class="col-md-12 text-center ">
+                                    <div class="form-group">
+                                        <input type="text" hidden name="id" id="id" value="<?php print_r((string)$item['_id']) ?>"
+                                        class="form-control">
+                                        <button type="submit" class=" btn btn-block mybtn btn-primary tx-tfm login-btn">Персоны и достопримечательности</button>
+                                    </div>
+                                </div>
+                                </form>
+
+                            </td>
                             <td><?php print_r($item['news_name']) ?></td>
                             <td><?php print_r($item['date']) ?></td>
-                            <td><?php print_r($item['link']) ?></td>
+                            <td><a href="<?php print_r($item['link']) ?>"><?php print_r($item['link']) ?></a></td>
                             <td><?php print_r($item['text']) ?></td>
                         <?php endif;?>
                 <?php $cnt++; endforeach;?>

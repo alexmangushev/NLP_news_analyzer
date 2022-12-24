@@ -32,15 +32,18 @@ if (!empty($_GET))
     // Поиск записи по ID
     if (sizeof($_GET['id']) > 0)
     {
-        $step = 1;
+        
         $result = $collection->find(); //fix /home/alex/nlp/sema/php/vendor/mongodb/mongodb/src/Operation/Find.php:317
         
-
+        $step = 0;
         $i = 0;
         foreach($result as $item)
         {
             if ($item['_id'] == $_GET['id'])
+            {
                 $start_index = $i;
+                $step = 1;
+            }
             $i++;
         }
 
@@ -94,7 +97,17 @@ if (!empty($_GET))
                     <tr>
                         <?php if ($cnt >= $start_index && $cnt < $start_index + $step):?>
                             <td><?php print_r($cnt) ?></td>
-                            <td><?php print_r($item['_id']) ?></td>
+                            <td>
+                            <form action="index.php" method="GET">
+                                <div class="col-md-12 text-center ">
+                                    <div class="form-group">
+                                        <input type="text" hidden name="id" id="id" value="<?php print_r((string)$item['_id']) ?>"
+                                        class="form-control">
+                                        <button type="submit" class=" btn btn-block mybtn btn-primary tx-tfm login-btn">Новость</button>
+                                    </div>
+                                </div>
+                                </form>
+                            </td>
                             <td><?php print_r($item['text']) ?></td>
                         <?php endif;?> 
                 <?php $cnt++; endforeach;?>
