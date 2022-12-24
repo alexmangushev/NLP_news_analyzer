@@ -2,3 +2,4 @@
 libmystem_c_binding.so
 tomita-parser
 /cloud_env
+*.json
