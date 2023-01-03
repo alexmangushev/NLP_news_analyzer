@@ -3,6 +3,8 @@ import os
 import sys
 import re
 from pymongo import MongoClient
+import string
+
 
 from pyspark.ml.feature import Word2VecModel
 from pyspark.sql import SparkSession
@@ -23,7 +25,7 @@ spark = SparkSession\
 if not os.path.exists('/home/alex/nlp/sema/word2vec/word2vec_model'):
     print("START")
 
-    if not os.path.exists('/home/alex/nlp/sema/word2vec/news.txt'):
+    if not os.path.exists('/home/alex/nlp/sema/word2vec/news/0.txt'):
 
         # start mongodb
         try:
@@ -37,10 +39,10 @@ if not os.path.exists('/home/alex/nlp/sema/word2vec/word2vec_model'):
         collection = db.First
         raw_news = collection.find()
 
-        f = open('/home/alex/nlp/sema/word2vec/news.txt', 'a')
-
         i = 0
         for news in raw_news:
+            path = '/home/alex/nlp/sema/word2vec/news/{}.txt'.format(i)
+            f = open(path, 'a')
             # if i == 20:
             #   break
             text =(re.sub(r'volgograd.kp.ru', '', news['text']))
@@ -56,15 +58,14 @@ if not os.path.exists('/home/alex/nlp/sema/word2vec/word2vec_model'):
             print(i)
             i+=1
 
-        f.close()
+            f.close()
 
     #sys.exit()
 
     # Построчная загрузка файла в RDD
-    input_file = spark.sparkContext.textFile('/home/alex/nlp/sema/word2vec/news.txt')
-    prepared = input_file.map(lambda x: ([x]))
-    df = prepared.toDF()
-    prepared_df = df.selectExpr('_1 as text')
+    input_file = spark.sparkContext.wholeTextFiles('/home/alex/nlp/sema/word2vec/news/*.txt')
+    prepared = input_file.map(lambda x: (x[0], x[1].translate(str.maketrans('', '', string.punctuation))))
+    prepared_df = prepared.toDF().selectExpr('_1 as path', '_2 as text')
 
     # Разбить на токены
     tokenizer = Tokenizer(inputCol='text', outputCol='words')
@@ -74,18 +75,8 @@ if not os.path.exists('/home/alex/nlp/sema/word2vec/word2vec_model'):
     stop_words = StopWordsRemover.loadDefaultStopWords('russian')
     remover = StopWordsRemover(inputCol='words', outputCol='filtered', stopWords=stop_words)
     filtered = remover.transform(words)
-    
 
-    # Вывести таблицу filtered
-    #filtered.show()
-
-    # Вывести столбец таблицы words с токенами до удаления стоп-слов
-    #words.select('words').show(truncate=False, vertical=True)
-
-    # Вывести столбец "filtered" таблицы filtered с токенами после удаления стоп-слов
-    #filtered.select('filtered').show(truncate=False, vertical=True)
-
-    word2Vec = Word2Vec(vectorSize=3, inputCol='filtered', outputCol='result')
+    word2Vec = Word2Vec(inputCol='filtered', outputCol='result')
     model = word2Vec.fit(filtered)
     w2v_df = model.transform(filtered)
     w2v_df.show()
