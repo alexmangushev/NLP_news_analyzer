@@ -63,7 +63,6 @@ def __main__():
 
         allNews = db.Second
         cnt = 0
-        rez = []
         #Для всех новостей из коллекции
         for news in allNews.find():
             # if (cnt == 1):
@@ -81,7 +80,10 @@ def __main__():
 
             start_sent = 0
 
+            cnt = 0
+
             while ('.' in tweet[start_sent:]):
+                cnt += 1
                 sentence = tweet[start_sent : end_sentence]
 
 
@@ -92,7 +94,7 @@ def __main__():
 
 
                 data = str({'Тональность': classifier.classify(dict([token, True] for token in custom_tokens))})
-                string = data+";"+string
+                string = string + str(cnt) + ")" + data[1:-1] + "\n "
 
                 start_sent = tweet.find('\n', end_sentence) + 1
                 end_sentence = tweet.find('.', start_sent)
@@ -102,7 +104,7 @@ def __main__():
             print(news_id)
 
             new_collection = db.Third
-            old_news = new_collection.find_one_and_delete({'_id': news_id})
+            new_collection.find_one_and_delete({'_id': news_id})
             new_collection.insert_one(
                 {
                     '_id': news_id,
