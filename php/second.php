@@ -1,6 +1,5 @@
 <?php require_once 'header.php';?>
 <?php
-require_once 'header.php';
 require __DIR__.'/vendor/autoload.php'; // include Composer's autoloader
 
 $client = new MongoDB\Client("mongodb://localhost:27017");
@@ -57,7 +56,6 @@ if (!empty($_GET))
 <div class="container">
     <p class="py-2"> <a href="/php/index.php">Первый студент</a></p>
     <p class="py-2"> <a href="/php/third.php">Третий студент</a></p>
-    <!--<p class="py-2"> <a href="/php/start_python.php?scrypt=2">Запустить обработку новостей</a></p>-->
 </div>
 
 <!-- db data 2 -->

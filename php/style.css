@@ -86,3 +86,8 @@ th {
     margin-left: -1px;
 }
 
+
+.sp {
+    white-space: pre-wrap;
+} 
+
