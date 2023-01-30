@@ -32,7 +32,7 @@ async def main():
         
         internal_links = []
         
-        with open('news_link.txt', 'r') as file:
+        with open('news_links.txt', 'r') as file:
             for link in file:
                 internal_links.append(link.strip())
                 
